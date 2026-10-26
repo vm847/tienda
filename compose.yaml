@@ -1,0 +1,31 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"                    # navegador: http://localhost:8080
+    volumes:
+      - ./:/var/www/html             # tu código entra al contenedor: cambios al instante
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password   # compatible con SQLyog
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}   # se lee del .env del proyecto
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      - "3308:3306"                  # SQLyog / DBeaver: 127.0.0.1, puerto 3308
+    volumes:
+      - datos_db:/var/lib/mysql      # la base sobrevive a docker compose down
+  phpmyadmin:
+    image: phpmyadmin:latest 
+    ports: 
+      - "8081:80" 
+    environment: 
+      PMA_HOST: db 
+    depends_on:
+      - db
+
+volumes:
+  datos_db:
